@@ -14,7 +14,7 @@ import model.*;
 
 public class FrmBanHang extends JPanel {
     private JTextField txtMaVach, txtSDT;
-    // ── Bảng danh sách sản phẩm (thêm mới, không ảnh hưởng code cũ) ──
+    // ── Bảng danh sách sản phẩm ──
     private JTable tblSanPham;
     private DefaultTableModel modelSanPham;
     private JTable tblGioHang;
@@ -53,7 +53,7 @@ public class FrmBanHang extends JPanel {
         tblGioHang.setRowHeight(40);
         tblGioHang.setFont(new Font("Arial", Font.PLAIN, 15));
 
-        // Bảng danh sách hàng hóa từ DB (ĐÃ CẬP NHẬT CỘT HÌNH ẢNH)
+        // Bảng danh sách hàng hóa từ DB 
         String[] colsSP = {"Hình ảnh", "Mã vạch", "Tên sản phẩm", "Đơn giá"};
         modelSanPham = new DefaultTableModel(colsSP, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -227,7 +227,7 @@ public class FrmBanHang extends JPanel {
         lblIconBarcode = (icoBarcode != null) ? new JLabel(icoBarcode) : new JLabel();
         lblIconSearch  = (icoSearch != null) ? new JLabel(icoSearch) : new JLabel();
 
-        // Đảm bảo phần văn bản (text) không bị đè lên bởi icon và được căn lề chuẩn
+        // Đảm bảo phần văn bản không bị đè lên bởi icon và được căn lề chuẩn
         btnThanhToan.setHorizontalTextPosition(SwingConstants.RIGHT);
         btnHuyDon.setHorizontalTextPosition(SwingConstants.RIGHT);
         btnXoaDong.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -237,7 +237,7 @@ public class FrmBanHang extends JPanel {
     }
 
     private void xuLySuKien() {
-    	// 1. Theo dõi mọi thay đổi trong ô text (xem app điện thoại có bắn chữ vào không)
+    	// 1. Theo dõi mọi thay đổi trong ô text 
         txtMaVach.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -481,7 +481,7 @@ public class FrmBanHang extends JPanel {
             
             Image img = null;
             
-            // 1. Tìm trong thư mục vật lý trước (Trị bách bệnh môi trường IDE)
+            // 1. Tìm trong thư mục vật lý trước 
             for (String folder : possibleFolders) {
                 for (String ext : extensions) {
                     java.io.File f = new java.io.File(folder + baseName + ext);
@@ -510,7 +510,7 @@ public class FrmBanHang extends JPanel {
                 Image scaledImage = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
                 return new ImageIcon(scaledImage);
             } else {
-                // In ra Console để Tuấn biết file nào bị thiếu thật sự
+                // In ra Console
                 System.err.println("❌ CẢNH BÁO: Không tìm thấy file ảnh gốc cho [" + baseName + "]");
             }
         } catch (Exception e) {

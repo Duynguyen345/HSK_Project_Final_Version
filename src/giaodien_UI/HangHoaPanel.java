@@ -357,23 +357,62 @@ public class HangHoaPanel extends JPanel {
 //	}
 //	
 	
-	private ImageIcon createImageIcon(String fileName, int width, int height) {
-	    try {
-	        if (fileName != null && !fileName.trim().isEmpty()) {
-	        
-	            java.net.URL imgURL = getClass().getResource("/Resource/HangHoa/" + fileName);
-	            if (imgURL != null) {
-	                ImageIcon icon = new ImageIcon(imgURL);
-	             
-	                Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-	                return new ImageIcon(scaledImage);
-	            }
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return null;
-	}
+	// ── Hàm tiện ích hỗ trợ load ảnh ──
+    private ImageIcon createImageIcon(String fileName, int width, int height) {
+        try {
+            if (fileName == null || fileName.trim().isEmpty()) return null;
+            
+            // Xóa đuôi file cũ trong Database (.jpg, .png) để tự động tìm lại
+            String baseName = fileName;
+            if (baseName.lastIndexOf('.') > 0) {
+                baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+            }
+
+            // Danh sách các thư mục phổ biến 
+            String[] possibleFolders = {
+                "Resource/HangHoa/", 
+                "src/Resource/HangHoa/", 
+                "resources/HangHoa/", 
+                "src/resources/HangHoa/"
+            };
+            
+            String[] extensions = {".png", ".jpg", ".jpeg"};
+            Image img = null;
+            
+            // 1. Tìm trong thư mục vật lý trước 
+            for (String folder : possibleFolders) {
+                for (String ext : extensions) {
+                    java.io.File f = new java.io.File(folder + baseName + ext);
+                    if (f.exists()) {
+                        img = new ImageIcon(f.getAbsolutePath()).getImage();
+                        break;
+                    }
+                }
+                if (img != null) break;
+            }
+            
+            // 2. Nếu vẫn không thấy, thử dùng Classpath 
+            if (img == null) {
+                for (String ext : extensions) {
+                    java.net.URL imgURL = getClass().getResource("/Resource/HangHoa/" + baseName + ext);
+                    if (imgURL == null) imgURL = getClass().getResource("/resources/HangHoa/" + baseName + ext);
+                    if (imgURL != null) {
+                        img = new ImageIcon(imgURL).getImage();
+                        break;
+                    }
+                }
+            }
+            
+            // 3. Scale ảnh và trả về
+            if (img != null) {
+                Image scaledImage = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                return new ImageIcon(scaledImage);
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi load ảnh " + fileName + ": " + e.getMessage());
+        }
+        return null;
+    }
 
 	class ImageRenderer extends JLabel implements TableCellRenderer {
 		private static final long serialVersionUID = 1L;

@@ -136,20 +136,21 @@ public class QuanLyLoHangPanel extends JPanel {
             form.add(fields[i], g);
         }
 
-        // Nút bấm
-        btnThem    = taoNut("+ Thêm",     new Color(39, 174, 96));
-        btnSua     = taoNut("✎ Sửa",      new Color(243, 156, 18));
-        btnXoa     = taoNut("✕ Xóa",      new Color(231, 76, 60));
-        btnLamMoi  = taoNut("↺ Làm mới",  new Color(108, 117, 125));
-        btnCanhBao = taoNut("⚠ Sắp hết hạn", new Color(142, 68, 173));
+     // Trích đoạn thay thế trong hàm taoFormNhapLieu() của file QuanLyLoHangPanel
+        // Nút bấm - Đã gỡ ký tự đặc biệt để tránh lỗi Encoding trên Eclipse
+        btnThem    = taoNut("Thêm",        new Color(39, 174, 96), "add.png");
+        btnSua     = taoNut("Sửa",         new Color(243, 156, 18), "edit.png");
+        btnXoa     = taoNut("Xóa",         new Color(231, 76, 60), "delete.png");
+        btnLamMoi  = taoNut("Làm mới",     new Color(108, 117, 125), "refresh.png");
+        btnCanhBao = taoNut("Sắp hết hạn", new Color(142, 68, 173), "outdate.png");
 
-        JPanel pnlBtn = new JPanel(new GridLayout(5, 1, 4, 6));
+        JPanel pnlBtn = new JPanel(new GridLayout(5, 1, 4, 8)); // Tăng khoảng cách các nút cho thoáng
         pnlBtn.setOpaque(false);
         pnlBtn.add(btnThem); pnlBtn.add(btnSua); pnlBtn.add(btnXoa);
         pnlBtn.add(btnLamMoi); pnlBtn.add(btnCanhBao);
 
         g.gridx = 0; g.gridy = labels.length; g.gridwidth = 2;
-        g.insets = new Insets(12, 4, 4, 4);
+        g.insets = new Insets(15, 4, 4, 4);
         form.add(pnlBtn, g);
 
         // Gắn sự kiện
@@ -294,12 +295,47 @@ public class QuanLyLoHangPanel extends JPanel {
         table.clearSelection();
     }
 
-    private JButton taoNut(String text, Color color) {
+ // ===== HELPER TAO NÚT BẤM (Đã MỞ KHÓA & quét ảnh tự động) =====
+    private JButton taoNut(String text, Color color, String iconFileName) {
         JButton btn = new JButton(text);
-        btn.setBackground(color); btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setFocusPainted(false); btn.setBorderPainted(false);
+        btn.setBackground(color); 
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFocusPainted(false); 
+        btn.setBorderPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        try {
+            Image img = null;
+            
+            // 1. Quét trực tiếp từ thư mục (Fix dứt điểm lỗi Eclipse không cập nhật Build Path)
+            java.io.File f1 = new java.io.File("src/Resource/Icons/" + iconFileName);
+            java.io.File f2 = new java.io.File("Resource/Icons/" + iconFileName);
+            
+            if (f1.exists()) {
+                img = new ImageIcon(f1.getAbsolutePath()).getImage();
+            } else if (f2.exists()) {
+                img = new ImageIcon(f2.getAbsolutePath()).getImage();
+            } else {
+                // 2. Dự phòng bằng Classpath
+                java.net.URL imgURL = getClass().getResource("/Resource/Icons/" + iconFileName);
+                if (imgURL != null) img = new ImageIcon(imgURL).getImage();
+            }
+
+            // 3. Nếu thấy ảnh -> Thu nhỏ về 20x20 và gắn vào nút
+            if (img != null) {
+                Image scaledImage = img.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+                btn.setIcon(new ImageIcon(scaledImage));
+                btn.setIconTextGap(10); 
+                btn.setHorizontalAlignment(SwingConstants.LEFT); 
+                btn.setMargin(new Insets(5, 15, 5, 15));
+            } else {
+                System.err.println("❌ CẢNH BÁO: Không tìm thấy icon [" + iconFileName + "] trong thư mục Resource/Icons");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi load icon " + iconFileName + ": " + e.getMessage());
+        }
+        
         return btn;
     }
 

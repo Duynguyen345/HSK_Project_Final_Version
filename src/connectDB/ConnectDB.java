@@ -9,7 +9,7 @@ import java.sql.SQLException;
  *
  * Cấu hình:
  *   SERVER   : Tên máy chủ SQL Server (mặc định: localhost\SQLEXPRESS)
- *   DATABASE : Tên cơ sở dữ liệu (mặc định: HSK_DB)
+ *   DATABASE : Tên cơ sở dữ liệu (mặc định: quanlycuahangtienloi)
  *   USERNAME : Tài khoản SQL Server (mặc định: sa)
  *   PASSWORD : Mật khẩu SQL Server (mặc định: 123456)
  *

@@ -204,12 +204,18 @@ public class HoaDonPanel extends JPanel {
     private void applyFilter() {
         String kw       = txtTimKiem.getText().trim();
         String hinhThuc = cbHinhThuc.getSelectedItem().toString();
+        
+        // Map từ text hiển thị sang mã DB
+        String dbHinhThuc = "Tất cả";
+        if (hinhThuc.equals("Tiền mặt")) dbHinhThuc = "TIEN_MAT";
+        else if (hinhThuc.equals("Chuyển khoản (Mã QR)")) dbHinhThuc = "CHUYEN_KHOAN";
+
         String tuNgay   = txtTuNgay.getText().trim();
         String denNgay  = txtDenNgay.getText().trim();
         double min = 0, max = 0;
         try { min = Double.parseDouble(txtMinTien.getText().trim()); } catch (Exception ignored) {}
         try { max = Double.parseDouble(txtMaxTien.getText().trim()); } catch (Exception ignored) {}
-        taiDanhSach(kw.isEmpty() ? null : kw, hinhThuc, tuNgay.isEmpty() ? null : tuNgay,
+        taiDanhSach(kw.isEmpty() ? null : kw, dbHinhThuc, tuNgay.isEmpty() ? null : tuNgay,
                     denNgay.isEmpty() ? null : denNgay, min, max);
     }
 
@@ -224,8 +230,14 @@ public class HoaDonPanel extends JPanel {
             for (Object[] row : list) {
                 Object ngay = row[1];
                 String ngayStr = (ngay != null) ? ngay.toString().substring(0, 16) : "";
+                
+                // Map mã DB về chữ hiển thị
+                String ht = row[4] != null ? row[4].toString() : "";
+                if (ht.equals("TIEN_MAT")) ht = "Tiền mặt";
+                else if (ht.equals("CHUYEN_KHOAN")) ht = "Chuyển khoản (Mã QR)";
+
                 modelHoaDon.addRow(new Object[]{
-                    row[0], ngayStr, row[2], row[3], row[4],
+                    row[0], ngayStr, row[2], row[3], ht,
                     String.format("%,.0f đ", row[5]),
                     String.format("%,.0f đ", row[6]),
                     String.format("%,.0f đ", row[7])
@@ -285,7 +297,10 @@ public class HoaDonPanel extends JPanel {
             String tenKH = header[3] != null ? header[3].toString() : "Vãng lai";
             String sdt   = header[4] != null ? header[4].toString() : "";
             sb.append("Khách  : ").append(tenKH).append(sdt.isEmpty() ? "" : " - " + sdt).append("\n");
-            sb.append("HT TT  : ").append(header[5]).append("\n");
+            String httt = header[5] != null ? header[5].toString() : "";
+            if (httt.equals("TIEN_MAT")) httt = "Tiền mặt";
+            else if (httt.equals("CHUYEN_KHOAN")) httt = "Chuyển khoản (Mã QR)";
+            sb.append("HT TT  : ").append(httt).append("\n");
             sb.append("------------------------------\n");
             sb.append(String.format("%-20s %4s %10s\n", "Sản phẩm", "SL", "Tiền"));
             sb.append("------------------------------\n");
