@@ -77,9 +77,11 @@ public class QuanLyLoHangPanel extends JPanel {
                     boolean sel, boolean focus, int row, int col) {
                 Component c = super.getTableCellRendererComponent(t, val, sel, focus, row, col);
                 String tt = (String) modelTable.getValueAt(row, 6);
-                if ("⚠ HẾT HẠN".equals(tt))      c.setBackground(new Color(255, 200, 200));
-                else if ("⏰ SẮP HẾT HẠN".equals(tt)) c.setBackground(new Color(255, 243, 176));
+                
+                if ("Hết hạn".equals(tt))      c.setBackground(new Color(255, 200, 200));
+                else if ("Sắp hết hạn".equals(tt)) c.setBackground(new Color(255, 243, 176));
                 else c.setBackground(sel ? new Color(174, 214, 241) : Color.WHITE);
+                
                 return c;
             }
         });
@@ -163,40 +165,51 @@ public class QuanLyLoHangPanel extends JPanel {
         return form;
     }
 
-    // ===== LOAD DỮ LIỆU =====
+ // ===== LOAD DỮ LIỆU =====
     public void loadData() {
-        modelTable.setRowCount(0);
-        for (LoHang lh : dao.getAllLoHang()) {
-            String tt;
-            if (lh.isHetHan()) tt = "⚠ HẾT HẠN";
-            else if (lh.isSapHetHan(30)) tt = "⏰ SẮP HẾT HẠN";
-            else tt = "✓ Còn hạn";
-            modelTable.addRow(new Object[]{
-                lh.getMaLo(), lh.getMaHH(), lh.getNgayNhap(),
-                lh.getHanSuDung(), lh.getSoLuongNhap(), lh.getSoLuongTon(), tt
-            });
-        }
-    }
-
-    // ===== TÌM KIẾM (ĐÃ ĐƯỢC FIX LỖI NULL) =====
-    private void timKiem() {
-        String kw = txtTimKiem.getText().trim().toLowerCase();
-        modelTable.setRowCount(0);
-        for (LoHang lh : dao.getAllLoHang()) {
-            // FIX: Tránh lỗi NullPointerException khi lấy mã bị rỗng
-            String maLo = lh.getMaLo() != null ? lh.getMaLo().toLowerCase() : "";
-            String maHH = lh.getMaHH() != null ? lh.getMaHH().toLowerCase() : "";
-            
-            if (maLo.contains(kw) || maHH.contains(kw)) {
+        try {
+            modelTable.setRowCount(0); // Xóa dữ liệu cũ trên bảng
+            for (LoHang lh : dao.getAllLoHang()) {
                 String tt;
-                if (lh.isHetHan()) tt = "⚠ HẾT HẠN";
-                else if (lh.isSapHetHan(30)) tt = "⏰ SẮP HẾT HẠN";
-                else tt = "✓ Còn hạn";
+                if (lh.isHetHan()) tt = "Hết hạn"; 
+                else if (lh.isSapHetHan(30)) tt = "Sắp hết hạn";
+                else tt = "Còn hạn";
+                
                 modelTable.addRow(new Object[]{
                     lh.getMaLo(), lh.getMaHH(), lh.getNgayNhap(),
                     lh.getHanSuDung(), lh.getSoLuongNhap(), lh.getSoLuongTon(), tt
                 });
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi load bảng: " + e.getMessage());
+        }
+    }
+
+ // ===== TÌM KIẾM =====
+    private void timKiem() {
+        try {
+            String kw = txtTimKiem.getText().trim().toLowerCase();
+            modelTable.setRowCount(0);
+            for (LoHang lh : dao.getAllLoHang()) {
+                String maLo = lh.getMaLo() != null ? lh.getMaLo().toLowerCase() : "";
+                String maHH = lh.getMaHH() != null ? lh.getMaHH().toLowerCase() : "";
+                
+                if (maLo.contains(kw) || maHH.contains(kw)) {
+                    String tt;
+                    // ĐÃ GỠ BỎ KÝ TỰ LỖI
+                    if (lh.isHetHan()) tt = "Hết hạn"; 
+                    else if (lh.isSapHetHan(30)) tt = "Sắp hết hạn";
+                    else tt = "Còn hạn";
+                    
+                    modelTable.addRow(new Object[]{
+                        lh.getMaLo(), lh.getMaHH(), lh.getNgayNhap(),
+                        lh.getHanSuDung(), lh.getSoLuongNhap(), lh.getSoLuongTon(), tt
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
